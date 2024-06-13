@@ -7,7 +7,7 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 const geometry = new T.BoxGeometry(1, 1, 1)
 const material = new T.MeshBasicMaterial({
-    color: 0x000000,
+    color: 0xFF0000,
 })
 const cube = new T.Mesh(geometry, material)
 scene.add(cube)
