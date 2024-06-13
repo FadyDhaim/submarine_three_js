@@ -1,14 +1,13 @@
 import * as THREE from 'three'
-import { OrbitControls } from '/jsm/controls/OrbitControls.js'
 import Stats from '/jsm/libs/stats.module.js'
 import { GUI } from 'dat.gui'
 import { Sky } from '/jsm/objects/Sky.js'
-import { GLTFLoader } from '/jsm/loaders/GLTFLoader.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Floater from '/utils/floater.js'
 import GerstnerWater from '/utils/gerstnerWater.js'
 
 const scene = new THREE.Scene()
-
 const earth = new THREE.Group()
 scene.add(earth)
 
