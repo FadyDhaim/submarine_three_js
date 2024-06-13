@@ -2,53 +2,26 @@
 <html lang="en">
 
 <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="author" content="Sean Bradley" />
-        <title>Gerstner Water</title>
-        <meta name="description" content="Three.js TypeScript Tutorials by Sean Bradley : https://sbcode.net/threejs" />
-        <style>
-            body {
-                overflow: hidden;
-                margin: 0px;
-            }
-        
-            #boatData {
-                position: absolute;
-                left: 20px;
-                bottom: 50px;
-                font-size: 17px;
-                font-family: monospace;
-                color: white;
-                pointer-events: none;
-            }
-        
-            #locationData {
-                position: absolute;
-                left: 20px;
-                bottom: 20px;
-                font-size: 17px;
-                font-family: monospace;
-                color: white;
-                pointer-events: none;
-            }
-        </style>
-        <script type="importmap">
-                    {
-                        "imports": {
-                            "three": "/build/three.module.min.js",
-                            "dat.gui": "/dat.gui"
-                        }
-                    }
-                </script>
+    <meta charset="utf-8">
+    <title>Submarine Simulation</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        #info{
+            position: absolute;
+            top: 10px;
+            color: aqua;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
-            <div id="boatData"></div>
-            <div id="locationData"></div>
-    <script type="module" src="/sample.js"></script>
-    <!-- <div id="info">Here is my text how about this</div> -->
-    <adfjasdfkafsf>
+        <script type="module" src="/main.js"></script>
 </body>
 
 </html>
