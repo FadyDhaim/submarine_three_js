@@ -8,8 +8,6 @@ document.body.appendChild(renderer.domElement)
 const geometry = new T.BoxGeometry(1, 1, 1)
 const material = new T.MeshBasicMaterial({
     color: 0x000000,
-    blendAlpha: 20,
-    alphaHash: 1,
 })
 const cube = new T.Mesh(geometry, material)
 scene.add(cube)
