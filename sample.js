@@ -1,11 +1,9 @@
 import * as THREE from 'three'
-import { GUI } from 'dat.gui'
-import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import * as dat from 'dat.gui';
+import { Sky } from 'three/examples/jsm/objects/Sky.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import Floater from '/utils/floater.js'
-import GerstnerWater from '/utils/gerstnerWater.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 const scene = new THREE.Scene()
 const earth = new THREE.Group()
@@ -33,7 +31,7 @@ controls.addEventListener('end', () => {
 
 const sun = new THREE.Vector3()
 
-const gui = new GUI()
+const dat = new dat.GUI()
 
 const gerstnerWater = new GerstnerWater(gui)
 earth.add(gerstnerWater.water)
@@ -171,7 +169,7 @@ let floaters = []
 // main user boat
 const loader = new GLTFLoader()
 loader.load(
-    '/models/boat.glb',
+    '/public/models/submarine.glb',
     function (gltf) {
         gltf.scene.traverse(function (child) {
             if (child.isMesh) {
