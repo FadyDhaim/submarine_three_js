@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import Stats from '/jsm/libs/stats.module.js'
 import { GUI } from 'dat.gui'
-import { Sky } from '/jsm/objects/Sky.js'
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Floater from '/utils/floater.js'
