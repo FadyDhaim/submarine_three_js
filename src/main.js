@@ -2,7 +2,6 @@ import * as T from 'three'; // Added semicolon for consistency
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; // Added semicolon for consistency
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Added semicolon for consistency
-import { color } from 'three/examples/jsm/nodes/Nodes';
 
 const scene = new T.Scene();
 const camera = new T.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
