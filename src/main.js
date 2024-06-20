@@ -3,13 +3,14 @@ import { AppLight } from './light'
 import { AppCamera } from './camera'
 import { AxesGridHelper } from './helpers/axes_grid_helper'
 import { AppCube } from './cube'
+import { SceneGraph, GraphNode } from './data/scene_graph'
 class SubmarineSimulationApp {
     constructor() {
         this.setupRenderer()
         this.setupCamera()
         this.setupLights()
-        this.setupComponents()
         this.setupScene()
+        this.setupSceneGraph()
         this.update = this.update.bind(this) // مشان نقدر نستخدم ذيس بقلب التابع يلي منستدعيه بكل فريم
     }
     setupRenderer() {
@@ -28,38 +29,34 @@ class SubmarineSimulationApp {
         this.lights =  [new AppLight()]
     }
     setupScene() {
-        const scene = new T.Scene()
-        this.lights.forEach(light => scene.add(light)) //اضافة الاضاءة يلي هيي الشمس بهي الحالة
-        this.visitComponents((component) => scene.add(component))// اضافة المكونات
-        this.scene = scene
+        this.scene = new T.Scene()
     }
-    setupComponents() {
+    setupSceneGraph() {
+        const cubes = new T.Object3D() //مجموعة مربعات
         const cube1 = new AppCube(0x00FF00)
         const cube2 = new AppCube(0x0000FF)
         cube2.position.x = 3
-        let components = {
-            cubes: [
-                cube1,
-                cube2,
-             ]
-        }
-    this.components = components
-    this.visitComponents((component, counter) => AxesGridHelper.makeAxesGridHelper(component, `cube ${counter + 1}`))
-    }
-    visitComponents(visitor) {
-        let counter = 0
-        for (const componentName in this.components) {
-            const component = this.components[componentName]
-            //ازا مصفوفة مشي فيها مشان نعالج كل مكون فيها لحال مثلا نضيفو للمشهد او نعمل فيو اي شي
-            if (Array.isArray(component)) {
-                for (const actualComponent of component) {
-                    visitor(actualComponent, counter)
-                    counter++
-                }
-            } else {
-                visitor(component, counter)
-                counter++
-            }
+        const sceneGraph = new SceneGraph()
+        const rootNode = new GraphNode('scene', this.scene)
+        sceneGraph.setRoot(rootNode)
+        rootNode.addChildren(
+            ['main light', this.lights[0]],
+            ['cubes', cubes]
+        )[1].addChildren(
+            ['cube1', cube1],
+            ['cube2', cube2]
+        )
+        this.sceneGraph = sceneGraph
+        sceneGraph.visitNodes(node => {
+            let object = node.object
+            let childrenObjects = node.children.map(node => node.object)
+            childrenObjects.forEach(childObject => object.add(childObject))
+            AxesGridHelper.makeAxesGridHelper(node.object, node.name)
+        })
+        //الشي يلي رح نحركو بل update
+        this.animatableComponents =
+        {
+            'cubes' :  cubes
         }
     }
     start() {
@@ -69,7 +66,9 @@ class SubmarineSimulationApp {
     update(time) {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
-        this.components.cubes.forEach(cube => cube.rotation.y = time)
+        const { cubes } = this.animatableComponents
+        cubes.rotation.x = time
+        cubes.rotation.y = time
         this.renderer.render(this.scene, this.camera)
         requestAnimationFrame(this.update)
     }
