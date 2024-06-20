@@ -51,7 +51,7 @@ class SubmarineSimulationApp {
             let object = node.object
             let childrenObjects = node.children.map(node => node.object)
             childrenObjects.forEach(childObject => object.add(childObject))
-            AxesGridHelper.makeAxesGridHelper(node.object, node.name)
+            AxesGridHelper.makeAxesGridHelper(object, node.name)
         })
         //الشي يلي رح نحركو بل update
         this.animatableComponents =
