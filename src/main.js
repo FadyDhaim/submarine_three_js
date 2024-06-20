@@ -34,9 +34,8 @@ class SubmarineSimulationApp {
         this.scene = scene
     }
     setupComponents() {
-        const boxGeometry = new T.BoxGeometry(1, 1, 1)
-        const cube1 = new AppCube(boxGeometry, 0x00FF00)
-        const cube2 = new AppCube(boxGeometry, 0x0000FF)
+        const cube1 = new AppCube(0x00FF00)
+        const cube2 = new AppCube(0x0000FF)
         cube2.position.x = 3
         let components = {
             cubes: [
