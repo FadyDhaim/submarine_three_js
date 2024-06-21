@@ -5,6 +5,7 @@ import { AppWater } from './water';
 import { AppSky } from './sky';
 import { AppSun } from './sun';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { Submarine } from './submarine';
 
 class SubmarineSimulationApp {
     constructor() {
@@ -48,6 +49,8 @@ class SubmarineSimulationApp {
         const sun = new AppSun(scene, this.renderer,sky, water);
         sun.update()
 
+        //Submarine
+        const submarine = new Submarine(scene)
         const controls = new OrbitControls(this.mainCamera, this.renderer.domElement);
         controls.maxPolarAngle = Math.PI * 0.495;
         controls.target.set(0, 10, 0);
