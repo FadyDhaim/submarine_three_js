@@ -78,8 +78,11 @@ class SubmarineSimulationApp {
     animate(time) {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
-        this.animatableComponents.water.material.uniforms['time'].value += 1.0 / 60.0;
-        this.animatableComponents.submarine.rotation.x = Math.PI / 4
+        const { water, submarine } = this.animatableComponents
+        water.material.uniforms['time'].value += 1.0 / 60.0;
+        if (submarine) {
+            submarine.rotation.y = time
+        }
         this.render()
     }
     render() {
