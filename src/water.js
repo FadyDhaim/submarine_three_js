@@ -1,4 +1,4 @@
-import { PlaneGeometry, RepeatWrapping, TextureLoader, Vector3 } from "three";
+import { BoxGeometry, PlaneGeometry, RepeatWrapping, TextureLoader, Vector3 } from "three";
 import { Water } from "three/examples/jsm/objects/Water";
 export class AppWater extends Water{
     static waterGeometry = new PlaneGeometry(10000, 10000);
@@ -26,5 +26,8 @@ export class AppWater extends Water{
         waterFolder.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale');
         waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
         waterFolder.open();
+    }
+    animate(time) {
+        this.material.uniforms['time'].value += 1.0 / 60.0;
     }
 } 
