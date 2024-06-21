@@ -25,7 +25,8 @@ class SubmarineSimulationApp {
     setupCameras() {
         AppCamera.aspectRatio = this.getAspectRatio()
         const mainCamera = new AppCamera()
-        mainCamera.position.set(30, 30, 100);
+        mainCamera.position.set(0, 30, 100);
+        mainCamera.lookAt(0,0,0)
         this.mainCamera = mainCamera
         this.cameras = [
             mainCamera
