@@ -1,13 +1,18 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 export class Submarine {
-    constructor(scene) {
+    constructor() {
+        this.modelPath = '../models/fixed_submarine.glb'
+    }
+    async load() {
         const loader = new GLTFLoader()
-        loader.load('../models/submarine.glb', function (gltf) {
-            const submarineObject = gltf.scene
-            scene.add(submarineObject)
-            submarineObject.position.set(0, 10, 0)
-            submarineObject.castShadow = true
-            submarineObject.scale.setScalar(35)
+        return new Promise((resolve, reject) => {
+            loader.load(this.modelPath, function (gltf) {
+                const submarineMesh = gltf.scene
+                submarineMesh.position.set(0, 10, 0)
+                submarineMesh.castShadow = true
+                submarineMesh.scale.setScalar(10)
+                resolve(submarineMesh)
+            })
         })
     }
 }

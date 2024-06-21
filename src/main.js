@@ -36,12 +36,12 @@ class SubmarineSimulationApp {
     setupLights() {}
     setupScene() {
         const scene = new THREE.Scene()
-
+        let animatableComponents = {}
         // Water
         const fogEnabled = scene.fog !== undefined
         const water = new AppWater(fogEnabled)
         scene.add(water);
-
+        animatableComponents['water'] = water
         // Skybox
         const sky = new AppSky();
         scene.add(sky);
@@ -50,7 +50,13 @@ class SubmarineSimulationApp {
         sun.update()
 
         //Submarine
-        const submarine = new Submarine(scene)
+        let submarine
+        new Submarine().load().then(submarineMesh => {
+            submarine = submarineMesh
+            scene.add(submarine)
+            animatableComponents['submarine'] = submarine
+        })
+        
         const controls = new OrbitControls(this.mainCamera, this.renderer.domElement);
         controls.maxPolarAngle = Math.PI * 0.495;
         controls.target.set(0, 10, 0);
@@ -62,10 +68,7 @@ class SubmarineSimulationApp {
         const gui = new GUI()
         water.showGui(gui)
         sun.showGui(gui)
-
-        this.animatableComponents = {
-            'water': water,
-        }
+        this.animatableComponents = animatableComponents
         this.scene = scene
     }
     
@@ -76,6 +79,7 @@ class SubmarineSimulationApp {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
         this.animatableComponents.water.material.uniforms['time'].value += 1.0 / 60.0;
+        this.animatableComponents.submarine.rotation.x = Math.PI / 4
         this.render()
     }
     render() {
