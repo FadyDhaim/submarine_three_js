@@ -1,76 +1,81 @@
-import * as T from 'three'
-import { AppLight } from './light'
+import * as THREE from 'three'
 import { AppCamera } from './camera'
-import { AxesGridHelper } from './helpers/axes_grid_helper'
-import { AppCube } from './cube'
-import { SceneGraph, GraphNode } from './data/scene_graph'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { AppWater } from './water';
+import { AppSky } from './sky';
+import { AppSun } from './sun';
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 class SubmarineSimulationApp {
     constructor() {
         this.setupRenderer()
-        this.setupCamera()
+        this.setupCameras()
         this.setupLights()
         this.setupScene()
-        this.setupSceneGraph()
-        this.update = this.update.bind(this) // مشان نقدر نستخدم ذيس بقلب التابع يلي منستدعيه بكل فريم
+        this.animate = this.animate.bind(this) // مشان نقدر نستخدم ذيس بقلب التابع يلي منستدعيه بكل فريم
     }
     setupRenderer() {
         const canvas = document.querySelector('#c') // جيب القماشة يلي رح نرندر عليها من ملف ال اتش تي م ل
-        const renderer = new T.WebGLRenderer({ antialias: true, canvas })
+        const renderer = new THREE.WebGLRenderer({ antialias: true, canvas })
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.5;
         this.renderer = renderer
     }
-    setupCamera() {
-        const camera = new AppCamera(this.getAspectRatio())
-        camera.position.z = 5
-        camera.position.y = 3
-        camera.lookAt(0,0,0)
-        this.camera = camera
+    setupCameras() {
+        AppCamera.aspectRatio = this.getAspectRatio()
+        const mainCamera = new AppCamera()
+        mainCamera.position.set(30, 30, 100);
+        this.mainCamera = mainCamera
+        this.cameras = [
+            mainCamera
+        ]
     }
-    setupLights() {
-        this.lights =  [new AppLight()]
-    }
+    setupLights() {}
     setupScene() {
-        this.scene = new T.Scene()
-    }
-    setupSceneGraph() {
-        const cubes = new T.Object3D() //مجموعة مربعات
-        const cube1 = new AppCube(0x00FF00)
-        const cube2 = new AppCube(0x0000FF)
-        cube2.position.x = 3
-        const sceneGraph = new SceneGraph()
-        const rootNode = new GraphNode('scene', this.scene)
-        sceneGraph.setRoot(rootNode)
-        rootNode.addChildren(
-            ['main light', this.lights[0]],
-            ['cubes', cubes]
-        )[1].addChildren(
-            ['cube1', cube1],
-            ['cube2', cube2]
-        )
-        this.sceneGraph = sceneGraph
-        sceneGraph.visitNodes(node => {
-            let object = node.object
-            let childrenObjects = node.children.map(node => node.object)
-            childrenObjects.forEach(childObject => object.add(childObject))
-            AxesGridHelper.makeAxesGridHelper(object, node.name)
-        })
-        //الشي يلي رح نحركو بل update
-        this.animatableComponents =
-        {
-            'cubes' :  cubes
+        const scene = new THREE.Scene()
+
+        // Water
+        const fogEnabled = scene.fog !== undefined
+        const water = new AppWater(fogEnabled)
+        scene.add(water);
+
+        // Skybox
+        const sky = new AppSky();
+        scene.add(sky);
+        
+        const sun = new AppSun(scene, this.renderer,sky, water);
+        sun.update()
+
+        const controls = new OrbitControls(this.mainCamera, this.renderer.domElement);
+        controls.maxPolarAngle = Math.PI * 0.495;
+        controls.target.set(0, 10, 0);
+        controls.minDistance = 40.0;
+        controls.maxDistance = 200.0;
+        controls.update();
+
+        // GUI        
+        const gui = new GUI()
+        water.showGui(gui)
+        sun.showGui(gui)
+
+        this.animatableComponents = {
+            'water': water,
         }
+        this.scene = scene
     }
+    
     start() {
-        this.renderer.setPixelRatio(window.devicePixelRatio)
-        requestAnimationFrame(this.update)
+        this.renderer.setAnimationLoop(this.animate)
     }
-    update(time) {
+    animate(time) {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
-        const { cubes } = this.animatableComponents
-        cubes.rotation.x = time
-        cubes.rotation.y = time
-        this.renderer.render(this.scene, this.camera)
-        requestAnimationFrame(this.update)
+        this.animatableComponents.water.material.uniforms['time'].value += 1.0 / 60.0;
+        this.render()
+    }
+    render() {
+        this.renderer.render(this.scene, this.mainCamera);
     }
     ensureResponsiveDisplay() {
         const resized = this.ensureRenderingAtFullResolution()
@@ -80,8 +85,10 @@ class SubmarineSimulationApp {
     }
     ensureProperProjection() {
         const aspectRatio = this.getAspectRatio()
-        this.camera.aspect = aspectRatio
-        this.camera.updateProjectionMatrix()
+        this.cameras.forEach(camera => {
+            camera.aspect = aspectRatio
+            camera.updateProjectionMatrix()
+        })
     }
     getAspectRatio() {
         const canvas = this.renderer.domElement

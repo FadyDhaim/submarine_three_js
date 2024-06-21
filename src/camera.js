@@ -1,7 +1,8 @@
 import { PerspectiveCamera } from "three"
 
 export class AppCamera extends PerspectiveCamera{
-    constructor(aspect, fovy = 75, near = 0.1, far = 1000) {
-        super(fovy, aspect, near, far)
+    constructor(fovy = 55, near = 1, far = 20000) {
+        super(fovy, AppCamera.aspectRatio, near, far)
     }
+    static aspectRatio
 }
