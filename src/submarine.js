@@ -28,8 +28,8 @@ export class Submarine {
         this.maximumForwardSpeed = 10.0
         this.maximumReverseSpeed = -5.0
         this.holdTime = 0 //in frames🖼️
-        this.maximumForwardHoldTime = 180  //3 seconds worth of frames @60 FPS
-        this.maximumReverseHoldTime = -180
+        this.maximumForwardHoldTime = 240  //4 seconds worth of frames @60 FPS
+        this.maximumReverseHoldTime = -240
         this.pushHoldTimeAhead = this.pushHoldTimeAhead.bind(this)
         this.pushHoldTimeBackward = this.pushHoldTimeBackward.bind(this)
         this.updateMotionState = this.updateMotionState.bind(this)
@@ -50,11 +50,13 @@ export class Submarine {
     }
 
     animate() {
-        // console.log(this.direction)
+        // console.log(this.accelerationState)
+        // console.log(this.motionState)
         if (this.accelerationState == accelerationStates.decelerating && this.holdTime != 0) {
             this.dampenHoldTime()
         }
         const acceleration = this._holdTimeToAcceleration()
+        console.log(acceleration)
         const currentLinearVelocity = this.velocity.linear
         let newLinearVelocity = currentLinearVelocity + acceleration
         this.submarineMesh.position.z -= newLinearVelocity
@@ -102,9 +104,10 @@ export class Submarine {
     _holdTimeToReverseAcceleration() {  //only called when holdTime is positive, ie, going forward
         const holdTime = this.holdTime
         const maximumSpeed = this.maximumReverseSpeed
-        const phase1 = (1 / 3) * this.maximumReverseHoldTime
-        const phase2 = (2 / 3) * this.maximumReverseHoldTime
-        const phase3 = (3 / 3) * this.maximumReverseHoldTime
+        const phase1 = (1 / 4) * this.maximumReverseHoldTime
+        const phase2 = (2 / 4) * this.maximumReverseHoldTime
+        const phase3 = (3 / 4) * this.maximumReverseHoldTime
+        const phase4 = (4/ 4) * this.maximumReverseHoldTime
         let acceleration
         if (holdTime >= phase1) {
             acceleration = (0.2 * maximumSpeed) / 60
@@ -115,7 +118,7 @@ export class Submarine {
         else if (holdTime > phase3) {
             acceleration = (0.4 * maximumSpeed) / 60
         }
-        else if (holdTime == phase3) {
+        else if (holdTime == phase4) {
             acceleration = 0
         }
         return acceleration
