@@ -1,11 +1,12 @@
+import { Vector3 } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-const motionDirections = Object.freeze(
-    {
-        reverse: Symbol('reverse'),
-        forward: Symbol('forward'),
-    }
-)
+// const motionDirections = Object.freeze(
+//     {
+//         reverse: Symbol('reverse'),
+//         forward: Symbol('forward'),
+//     }
+// )
 const accelerationStates = Object.freeze({
     decelerating: Symbol('decelerating'),
     accelerating: Symbol('accelerating'),
@@ -48,7 +49,9 @@ export class Submarine {
             })
         })
     }
-
+    getWorldPosition() {
+        return this.submarineMesh.getWorldPosition(new Vector3(0,0,0))
+    }
     animate() {
         // console.log(this.accelerationState)
         // console.log(this.motionState)

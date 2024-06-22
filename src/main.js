@@ -68,11 +68,12 @@ class SubmarineSimulationApp {
             scene.add(submarineMesh)
             animatableComponents.push(submarine)
             const submarineCamera = new SubmarineCamera()
+            submarineCamera.setupControls(this.renderer)
             submarineMesh.add(submarineCamera)
             this.cameras.push(submarineCamera)
-            submarineCamera.setupControls(this.renderer)
+            this.animatableComponents.push(submarineCamera)
         })
-
+        this.submarine = submarine
         // GUI        
         const gui = new GUI()
         water.showGui(gui)
