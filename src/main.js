@@ -41,7 +41,6 @@ class SubmarineSimulationApp {
     setupScene() {
         const scene = new THREE.Scene()
         let animatableComponents = []
-        scene.add(...this.lights)
         // Water
         const fogEnabled = scene.fog !== undefined
         const water = new AppWater(fogEnabled)

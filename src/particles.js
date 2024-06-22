@@ -2,7 +2,9 @@ import { BufferGeometry, Float32BufferAttribute, Points, PointsMaterial } from "
 
 export class Particles extends Points{
     constructor(underWaterOnly) {
+        //الف جزيئة او غبرة بالجو وكل وحدة بتتألف من تلت احداثيات اكس وواي وزد لهيك منضيف تلاتة ع كل وحدة
         const particleCount = 1000;
+        //الهندسية يلي بتسمحلنا نتحكم بال vertices
         const particlesGeometry = new BufferGeometry();
         const particlesPositions = [];
 
@@ -24,6 +26,7 @@ export class Particles extends Points{
     }
 
     animate(time) {
+        //خليهن يفتلو حوالي المبدأ باعتبار انضافو للمشهد مباشرة
         this.rotation.y = time * 0.1;
     }
 }

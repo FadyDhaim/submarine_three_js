@@ -20,7 +20,6 @@ export class AppSun extends Vector3 {
         const phi = MathUtils.degToRad(90 - elevation)
         const theta = MathUtils.degToRad(azimuth)
         this.setFromSphericalCoords(1, phi, theta)
-        console.log('hello')
         this.sky.material.uniforms['sunPosition'].value.copy(this)
         this.water.material.uniforms['sunDirection'].value.copy(this).normalize()
         if (this.renderTarget !== undefined) this.renderTarget.dispose()
