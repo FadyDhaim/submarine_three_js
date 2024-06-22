@@ -1,20 +1,20 @@
 import * as THREE from 'three'
-import { AppCamera } from './camera'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { AppWater } from './water'
 import { AppSky } from './sky'
 import { AppSun } from './sun'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { Submarine } from './submarine'
 import { Particles } from './particles'
+import { AppCamera } from './cameras/app_camera'
+import { MainCamera } from './cameras/main_camera'
+import { SubmarineCamera } from './cameras/submarine_camera'
 
 class SubmarineSimulationApp {
     constructor() {
         this.setupRenderer()
-        this.setupCameras()
+        this.setupMainCamera()
         this.setupLights()
         this.setupScene()
-        this.setupControls()
         this.animate = this.animate.bind(this) // مشان نقدر نستخدم ذيس بقلب التابع يلي منستدعيه بكل فريم
     }
     setupRenderer() {
@@ -25,15 +25,15 @@ class SubmarineSimulationApp {
         renderer.toneMappingExposure = 0.5
         this.renderer = renderer
     }
-    setupCameras() {
+    setupMainCamera() {
+        this.cameras = []
         AppCamera.aspectRatio = this.getAspectRatio()
-        const mainCamera = new AppCamera()
+        const mainCamera = new MainCamera()
         mainCamera.position.set(0, 30, 100)
-        mainCamera.lookAt(0,0,0)
+        mainCamera.lookAt(0, 0, 0)
+        mainCamera.setupControls(this.renderer)
         this.mainCamera = mainCamera
-        this.cameras = [
-            mainCamera
-        ]
+        this.cameras.push(mainCamera)
     }
     setupLights() {
         this.lights = []
@@ -58,8 +58,8 @@ class SubmarineSimulationApp {
         // Skybox
         const sky = new AppSky()
         scene.add(sky)
-        
-        const sun = new AppSun(scene, this.renderer,sky, water)
+
+        const sun = new AppSun(scene, this.renderer, sky, water)
         sun.update()
 
         //Submarine
@@ -67,8 +67,12 @@ class SubmarineSimulationApp {
         submarine.load().then(submarineMesh => {
             scene.add(submarineMesh)
             animatableComponents.push(submarine)
+            const submarineCamera = new SubmarineCamera()
+            submarineMesh.add(submarineCamera)
+            this.cameras.push(submarineCamera)
+            submarineCamera.setupControls(this.renderer)
         })
-        
+
         // GUI        
         const gui = new GUI()
         water.showGui(gui)
@@ -76,14 +80,6 @@ class SubmarineSimulationApp {
 
         this.animatableComponents = animatableComponents
         this.scene = scene
-    }
-    setupControls() {
-        const controls = new OrbitControls(this.mainCamera, this.renderer.domElement)
-        controls.maxPolarAngle = Math.PI * 0.495
-        controls.target.set(0, 10, 0)
-        controls.minDistance = 40.0
-        controls.maxDistance = 200.0
-        controls.update()
     }
 
     start() {
@@ -98,7 +94,7 @@ class SubmarineSimulationApp {
         this.render()
     }
     render() {
-        this.renderer.render(this.scene, this.mainCamera)
+        this.renderer.render(this.scene, this.cameras[1] ? this.cameras[1] : this.mainCamera) //كاميرا الغواصة
     }
     ensureResponsiveDisplay() {
         const resized = this.ensureRenderingAtFullResolution()

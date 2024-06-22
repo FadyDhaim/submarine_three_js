@@ -1,24 +1,30 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-// const directions = Object.freeze(
-//     {
-//         reverse: Symbol('reverse'),
-//         idle: Symbol('idle'),
-//         forward: Symbol('forward'),
-//     }
-// )
-const motionState = Object.freeze({
+const motionDirections = Object.freeze(
+    {
+        reverse: Symbol('reverse'),
+        forward: Symbol('forward'),
+    }
+)
+const accelerationStates = Object.freeze({
+    decelerating: Symbol('decelerating'),
+    accelerating: Symbol('accelerating'),
+})
+const motionStates = Object.freeze({
     idle: Symbol('idle'),
     inMotion: Symbol('inMotion')
 })
 export class Submarine {
     constructor() {
         this.modelPath = '../models/submarine.glb'
+        this.submarineMesh = null
         this.velocity = {
             linear: 0.0,
             angular: 0.0
         }
-        this.motionState = motionState.idle
+        this.motionState = motionStates.idle
+        this.motionDirection = null
+        this.accelerationState = null
         this.maximumForwardSpeed = 10.0
         this.maximumReverseSpeed = -5.0
         this.holdTime = 0 //in frames🖼️
@@ -33,7 +39,7 @@ export class Submarine {
         return new Promise((resolve, reject) => {
             loader.load(this.modelPath, (gltf) => {
                 const submarineMesh = gltf.scene
-                submarineMesh.position.set(0, -2, 0)
+                submarineMesh.position.set(0, 0, 0)
                 submarineMesh.castShadow = true
                 submarineMesh.scale.setScalar(10)
                 this.submarineMesh = submarineMesh
@@ -43,16 +49,16 @@ export class Submarine {
         })
     }
 
-    animate(time) {
+    animate() {
         // console.log(this.direction)
-        if (this.motionState == motionState.idle && this.holdTime != 0) {
+        if (this.accelerationState == accelerationStates.decelerating && this.holdTime != 0) {
             this.dampenHoldTime()
         }
         const acceleration = this._holdTimeToAcceleration()
-        const { velocity } = this
-        const { linear: currentLinearVelocity, angular } = velocity
+        const currentLinearVelocity = this.velocity.linear
         let newLinearVelocity = currentLinearVelocity + acceleration
         this.submarineMesh.position.z -= newLinearVelocity
+        this.velocity.linear = newLinearVelocity
     }
     _holdTimeToAcceleration() {
         let acceleration = 0
@@ -61,6 +67,9 @@ export class Submarine {
             acceleration = this._holdTimeToForwardAcceleration()
         } else if (holdTime < 0) {
             acceleration = this._holdTimeToReverseAcceleration()
+        }
+        if (this.accelerationState == accelerationStates.decelerating) {
+            acceleration = -acceleration
         }
         return acceleration
     }
@@ -112,19 +121,18 @@ export class Submarine {
         return acceleration
     }
     _setupInteractivity() {
-        const pushHoldTimeAheadCallback = this.pushHoldTimeAhead
-        const pushHoldTimeBackwardCallback = this.pushHoldTimeBackward
-        const updateMotionStateCallback = this.updateMotionState
-        window.addEventListener('keydown', function (event) {
+        window.addEventListener('keydown', (event) => {
             const key = event.key
             switch (key) {
                 case 'ArrowUp':
-                    updateMotionStateCallback(motionState.inMotion)
-                    pushHoldTimeAheadCallback()
+                    this.updateMotionState(motionStates.inMotion)
+                    this.updateAccelerationState(accelerationStates.accelerating)
+                    this.pushHoldTimeAhead()
                     break
                 case 'ArrowDown':
-                    updateMotionStateCallback(motionState.inMotion)
-                    pushHoldTimeBackwardCallback()
+                    this.updateMotionState(motionStates.inMotion)
+                    this.updateAccelerationState(accelerationStates.accelerating)
+                    this.pushHoldTimeBackward()
                     break
             }
         })
@@ -133,7 +141,7 @@ export class Submarine {
             switch (key) {
                 case 'ArrowUp':
                 case 'ArrowDown':
-                    this.motionState = motionState.idle
+                    this.updateAccelerationState(accelerationStates.decelerating)
                     break
             }
         })
@@ -154,8 +162,18 @@ export class Submarine {
         } else if (this.holdTime < 0) {
             this.holdTime++
         }
+        if (this.holdTime == 0) {
+            this.updateMotionState(motionStates.idle)
+        }
     }
-    updateMotionState(newMotionState) {
-        this.motionState = newMotionState
+    updateMotionState(value) {
+        if (this.motionState != value) {
+            this.motionState = value
+        }
+    }
+    updateAccelerationState(value) {
+        if (this.accelerationState != value) {
+            this.accelerationState = value
+        }
     }
 }
