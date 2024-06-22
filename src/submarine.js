@@ -1,9 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-//⚠️⚠️⚠️⚠️🚧🚧👷 
-// هاد الملف تحت الصيانة بشيل طيزك ازا بتقربي عليه
-//⚠️⚠️⚠️⚠️🚧🚧👷 
-
 // const directions = Object.freeze(
 //     {
 //         reverse: Symbol('reverse'),
