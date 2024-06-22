@@ -4,13 +4,17 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // هاد الملف تحت الصيانة بشيل طيزك ازا بتقربي عليه
 //⚠️⚠️⚠️⚠️🚧🚧👷 
 
-const directions = Object.freeze(
-    {
-        reverse: Symbol('reverse'),
-        idle: Symbol('idle'),
-        forward: Symbol('forward'),
-    }
-)
+// const directions = Object.freeze(
+//     {
+//         reverse: Symbol('reverse'),
+//         idle: Symbol('idle'),
+//         forward: Symbol('forward'),
+//     }
+// )
+const state = Object.freeze({
+    idle: Symbol('idle'),
+    inMotion: Symbol('inMotion')
+})
 export class Submarine {
     constructor() {
         this.modelPath = '../models/submarine.glb'
@@ -18,7 +22,7 @@ export class Submarine {
             linear: 0.0,
             angular: 0.0
         }
-        this.direction = directions.idle
+        this.state = state.idle
         this.maximumForwardSpeed = 10.0
         this.maximumReverseSpeed = -5.0
         this.holdTime = 0 //in frames🖼️
@@ -26,7 +30,7 @@ export class Submarine {
         this.maximumReverseHoldTime = -180
         this.pushHoldTimeAhead = this.pushHoldTimeAhead.bind(this)
         this.pushHoldTimeBackward = this.pushHoldTimeBackward.bind(this)
-        this.updateDirection = this.updateDirection.bind(this)
+        this.updateMotionState = this.updateMotionState.bind(this)
     }
     async load() {
         const loader = new GLTFLoader()
@@ -45,21 +49,13 @@ export class Submarine {
 
     animate(time) {
         // console.log(this.direction)
-        if (this.direction == directions.idle && this.holdTime != 0) {
+        if (this.state == state.idle && this.holdTime != 0) {
             this.dampenHoldTime()
         }
-        const acceleration = this._holdTimeToForwardAcceleration()
-        const { direction, velocity } = this
-        const { linear, angular } = velocity
-        let newLinearVelocity
-        switch (direction) {
-            case directions.forward:
-                console.log('forward')
-                newLinearVelocity = linear + acceleration
-                break
-            case directions.reverse:
-                newLinearVelocity = linear - acceleration
-        }
+        const acceleration = this._holdTimeToAcceleration()
+        const { velocity } = this
+        const { linear: currentLinearVelocity, angular } = velocity
+        let newLinearVelocity = currentLinearVelocity + acceleration
         if (newLinearVelocity) {
             this.submarineMesh.position.z -= newLinearVelocity
         }
@@ -70,7 +66,7 @@ export class Submarine {
         if (holdTime > 0) {
             acceleration = this._holdTimeToForwardAcceleration()
         } else if (holdTime < 0) {
-
+            acceleration = this._holdTimeToReverseAcceleration()
         }
         return acceleration
     }
@@ -80,7 +76,7 @@ export class Submarine {
         const phase1 = (1 / 3) * this.maximumForwardHoldTime
         const phase2 =(2 / 3) * this.maximumForwardHoldTime
         const phase3 = (3 / 3) * this.maximumForwardHoldTime
-        let acceleration = 0
+        let acceleration
         if (holdTime <= phase1) {
             // return 0.002    //0.002 * 60  = 0.12    == 20% of maxium speed (0.6) in one second
             acceleration = (0.2 * maximumSpeed) / 60
@@ -90,10 +86,13 @@ export class Submarine {
             //                                                                                                           20%Max + X * 60 = 50% MAx => X * 60 = 30% Max => X = 30% / 60
             acceleration = (0.3 * maximumSpeed) / 60
         }
-        else if (holdTime <= phase3){
+        else if (holdTime < phase3){
             // return 0.004    //0.3 + third-second = 0.3 + 0.004 * 60 = 0.54,  (90% of maximum speed in 3 seconds)
             //50%Max + X * 60 = 90% Max => X * 60 = 40% Max   => X = 40% Max / 60
             acceleration = (0.4 * maximumSpeed) / 60
+        }
+        else if (holdTime == phase3) {
+            return acceleration = 0
         }
         return acceleration
     }
@@ -103,41 +102,44 @@ export class Submarine {
         const phase1 = (1 / 3) * this.maximumReverseHoldTime
         const phase2 = (2 / 3) * this.maximumReverseHoldTime
         const phase3 = (3 / 3) * this.maximumReverseHoldTime
-        let acceleration = 0
+        let acceleration
         if (holdTime >= phase1) {
             acceleration = (0.2 * maximumSpeed) / 60
         }
         else if (holdTime >= phase2) {
             acceleration = (0.3 * maximumSpeed) / 60
         }
-        else if (holdTime >= phase3){
+        else if (holdTime > phase3) {
             acceleration = (0.4 * maximumSpeed) / 60
+        }
+        else if (holdTime == phase3) {
+            acceleration = 0
         }
         return acceleration
     }
     _setupInteractivity() {
         const pushHoldTimeAheadCallback = this.pushHoldTimeAhead
         const pushHoldTimeBackwardCallback = this.pushHoldTimeBackward
-        const updateDirectionCallback = this.updateDirection
+        const updateMotionStateCallback = this.updateMotionState
         window.addEventListener('keydown', function (event) {
             const key = event.key
             switch (key) {
                 case 'ArrowUp':
-                    updateDirectionCallback(directions.forward)
+                    updateMotionStateCallback(state.inMotion)
                     pushHoldTimeAheadCallback()
                     break
                 case 'ArrowDown':
-                    updateDirectionCallback(directions.reverse)
+                    updateMotionStateCallback(state.inMotion)
                     pushHoldTimeBackwardCallback()
                     break
             }
         })
-        window.addEventListener('keyup', function (event) {
+        window.addEventListener('keyup', (event) =>{
             const key = event.key
             switch (key) {
                 case 'ArrowUp':
                 case 'ArrowDown':
-                    this.direction = directions.idle
+                    this.state = state.idle
                     break
             }
         })
@@ -159,7 +161,7 @@ export class Submarine {
             this.holdTime++
         }
     }
-    updateDirection(newDirection) {
-        this.direction = newDirection
+    updateMotionState(newMotionState) {
+        this.state = newMotionState
     }
 }
