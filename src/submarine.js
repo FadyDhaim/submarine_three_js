@@ -11,7 +11,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 //         forward: Symbol('forward'),
 //     }
 // )
-const state = Object.freeze({
+const motionState = Object.freeze({
     idle: Symbol('idle'),
     inMotion: Symbol('inMotion')
 })
@@ -22,7 +22,7 @@ export class Submarine {
             linear: 0.0,
             angular: 0.0
         }
-        this.state = state.idle
+        this.motionState = motionState.idle
         this.maximumForwardSpeed = 10.0
         this.maximumReverseSpeed = -5.0
         this.holdTime = 0 //in frames🖼️
@@ -49,16 +49,14 @@ export class Submarine {
 
     animate(time) {
         // console.log(this.direction)
-        if (this.state == state.idle && this.holdTime != 0) {
+        if (this.motionState == motionState.idle && this.holdTime != 0) {
             this.dampenHoldTime()
         }
         const acceleration = this._holdTimeToAcceleration()
         const { velocity } = this
         const { linear: currentLinearVelocity, angular } = velocity
         let newLinearVelocity = currentLinearVelocity + acceleration
-        if (newLinearVelocity) {
-            this.submarineMesh.position.z -= newLinearVelocity
-        }
+        this.submarineMesh.position.z -= newLinearVelocity
     }
     _holdTimeToAcceleration() {
         let acceleration = 0
@@ -125,11 +123,11 @@ export class Submarine {
             const key = event.key
             switch (key) {
                 case 'ArrowUp':
-                    updateMotionStateCallback(state.inMotion)
+                    updateMotionStateCallback(motionState.inMotion)
                     pushHoldTimeAheadCallback()
                     break
                 case 'ArrowDown':
-                    updateMotionStateCallback(state.inMotion)
+                    updateMotionStateCallback(motionState.inMotion)
                     pushHoldTimeBackwardCallback()
                     break
             }
@@ -139,7 +137,7 @@ export class Submarine {
             switch (key) {
                 case 'ArrowUp':
                 case 'ArrowDown':
-                    this.state = state.idle
+                    this.motionState = motionState.idle
                     break
             }
         })
@@ -162,6 +160,6 @@ export class Submarine {
         }
     }
     updateMotionState(newMotionState) {
-        this.state = newMotionState
+        this.motionState = newMotionState
     }
 }
