@@ -100,22 +100,17 @@ export class Submarine {
     _holdTimeToReverseAcceleration() {  //only called when holdTime is positive, ie, going forward
         const holdTime = this.holdTime
         const maximumSpeed = this.maximumReverseSpeed
-        const phase1 = (1 / 3) * this.maximumForwardHoldTime
-        const phase2 = (2 / 3) * this.maximumForwardHoldTime
-        const phase3 = (3 / 3) * this.maximumForwardHoldTime
+        const phase1 = (1 / 3) * this.maximumReverseHoldTime
+        const phase2 = (2 / 3) * this.maximumReverseHoldTime
+        const phase3 = (3 / 3) * this.maximumReverseHoldTime
         let acceleration = 0
-        if (holdTime >= -60) {
-            // return 0.002    //0.002 * 60  = 0.12    == 20% of maxium speed (0.6) in one second
+        if (holdTime >= phase1) {
             acceleration = (0.2 * maximumSpeed) / 60
         }
-        else if (holdTime >= -) {
-            // return 0.003    //first-second-speed + second-second-speed = 0.12 + 0.003 * 60 = 0.3  == 50% of maxium speed
-            //                                                                                                           20%Max + X * 60 = 50% MAx => X * 60 = 30% Max => X = 30% / 60
+        else if (holdTime >= phase2) {
             acceleration = (0.3 * maximumSpeed) / 60
         }
-        else if (holdTime <= this.maximumForwardHoldTime){
-            // return 0.004    //0.3 + third-second = 0.3 + 0.004 * 60 = 0.54,  (90% of maximum speed in 3 seconds)
-            //50%Max + X * 60 = 90% Max => X * 60 = 40% Max   => X = 40% Max / 60
+        else if (holdTime >= phase3){
             acceleration = (0.4 * maximumSpeed) / 60
         }
         return acceleration
