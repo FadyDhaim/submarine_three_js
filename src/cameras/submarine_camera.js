@@ -10,7 +10,6 @@ export class SubmarineCamera extends AppCamera {
         controls.minDistance = 15.0
         controls.maxDistance = 25.0
         controls.update()
-        this.controls = controls
     }
     animate() {
         const { x, y, z } = this.parent.getWorldPosition(new Vector3(0, 0, 0))

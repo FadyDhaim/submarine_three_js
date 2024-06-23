@@ -14,7 +14,6 @@ class Physic {
         const archimedesForce = new Vector(0, archimedesForceMagnitude, 0);
         return archimedesForce;
     }
-
 //الثقل
     static CalculateWeightForce(mass) {
         const weightForce = this._GRAVITY_ACCELERATION * mass;
