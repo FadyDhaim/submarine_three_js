@@ -1,7 +1,7 @@
 import Vector from "/Vector.js";
-import Physic from "./Physic.js";
+import Physic from "./physics.js";
 
-class Submarine {
+class SubmarinePhysics {
     constructor() {
         this._radius = 3; // نصف قطر أكبر مقطع في الغواصة
         this._height = 15; // طول الغواصة
@@ -296,10 +296,10 @@ class Submarine {
     }
 
 }
-export default Submarine;
+export default SubmarinePhysics;
 
 // إنشاء كائن جديد من الفئة Submarine
-let mySubmarine = new Submarine();
+let mySubmarine = new SubmarinePhysics();
 
 // زمن الفاصل الزمني
 const deltaTime = 1;
