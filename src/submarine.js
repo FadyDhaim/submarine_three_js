@@ -25,7 +25,7 @@ export class Submarine {
         this.accelerationState = null
         this.maximumForwardSpeed = 6.0
         this.maximumReverseSpeed = -4.0
-        this.holdTime = 0 //in frames🖼️
+        this.holdTime = 0 //in frames
         this.maximumForwardHoldTime = 360  //4 seconds worth of frames @60 FPS
         this.maximumReverseHoldTime = -360
         this.didDampenLastFrame = false
@@ -54,7 +54,7 @@ export class Submarine {
         }
         const velocity = this._holdTimeToLinearVelocity()
         this.submarineMesh.position.z -= velocity
-        console.log(velocity)
+        // console.log(velocity)
     }
     _holdTimeToLinearVelocity() {
         let velocity
@@ -87,9 +87,11 @@ export class Submarine {
             switch (key) {
                 case 'w':
                     this.accelerateForward()
+                    console.log('W')
                     break
                 case 's':
                     this.accelerateBackward()
+                    console.log('S')
                     break
             }
         })
@@ -99,6 +101,7 @@ export class Submarine {
                 case 'w':
                 case 's':
                     this.updateAccelerationState(accelerationStates.decelerating)
+                    console.log('No Key Pressed')
                     break
             }
         })
