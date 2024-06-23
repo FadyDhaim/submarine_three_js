@@ -1,7 +1,7 @@
-import { BoxGeometry, PlaneGeometry, RepeatWrapping, TextureLoader, Vector3 } from "three";
+import { PlaneGeometry, RepeatWrapping, TextureLoader, Vector3 } from "three";
 import { Water } from "three/examples/jsm/objects/Water";
 export class AppWater extends Water{
-    static waterGeometry = new PlaneGeometry(10000, 10000);
+    static waterGeometry = new PlaneGeometry(100000, 100000);
     constructor(fogEnabled) {
         super(
             AppWater.waterGeometry,
