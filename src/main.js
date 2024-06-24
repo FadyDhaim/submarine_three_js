@@ -1,13 +1,12 @@
 import * as THREE from 'three'
-import { AppWater } from './water'
-import { AppSky } from './sky'
-import { AppSun } from './sun'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { Submarine } from './submarine'
 import { Particles } from './particles'
 import { AppCamera } from './cameras/app_camera'
 import { MainCamera } from './cameras/main_camera'
 import { SubmarineCamera } from './cameras/submarine_camera'
+import { Ocean } from './ocean'
+import { AppSky } from './sky'
 
 class SubmarineSimulationApp {
     constructor() {
@@ -40,12 +39,14 @@ class SubmarineSimulationApp {
     }
     setupScene() {
         const scene = new THREE.Scene()
+        this.scene = scene
         let animatableComponents = []
+        this.animatableComponents = animatableComponents
         // Water
-        const fogEnabled = scene.fog !== undefined
-        const water = new AppWater(fogEnabled)
-        scene.add(water)
-        animatableComponents.push(water)
+        // const fogEnabled = scene.fog !== undefined
+        // const water = new AppWater(fogEnabled)
+        // scene.add(water)
+        // animatableComponents.push(water)
 
         //particles
         const particles = new Particles()
@@ -56,11 +57,15 @@ class SubmarineSimulationApp {
         scene.add(underWaterParticles)
         animatableComponents.push(underWaterParticles)
         // Skybox
-        const sky = new AppSky()
-        scene.add(sky)
-
-        const sun = new AppSun(scene, this.renderer, sky, water)
-        sun.update()
+        // const sky = new AppSky()
+        // scene.add(sky)
+        const ocean = new Ocean()
+        ocean.load().then((oceanObject) => {
+            animatableComponents.push(ocean)
+            scene.add(oceanObject)
+        })
+        // const sun = new AppSun(scene, this.renderer, sky, water)
+        // sun.update()
 
         //Submarine
         let submarine = new Submarine()
@@ -76,11 +81,9 @@ class SubmarineSimulationApp {
         this.submarine = submarine
         // GUI        
         const gui = new GUI()
-        water.showGui(gui)
-        sun.showGui(gui)
-
-        this.animatableComponents = animatableComponents
-        this.scene = scene
+        // water.showGui(gui)
+        // sun.showGui(gui)
+        
     }
 
     start() {
@@ -89,6 +92,7 @@ class SubmarineSimulationApp {
     animate(time) {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
+        // console.log(this.animatableComponents.length)
         for (let animtableComponent of this.animatableComponents) {
             animtableComponent.animate(time)
         }

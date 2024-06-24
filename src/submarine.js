@@ -36,7 +36,7 @@ export class Submarine {
             loader.load(this.modelPath, (gltf) => {
                 const submarineMesh = gltf.scene
                 submarineMesh.position.set(0, 0, 0)
-                submarineMesh.castShadow = true
+                // submarineMesh.castShadow = true
                 submarineMesh.scale.setScalar(10)
                 this.submarineMesh = submarineMesh
                 this._setupInteractivity()

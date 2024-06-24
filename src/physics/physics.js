@@ -8,27 +8,27 @@ class Physic {
     static _FRICTION_COEFFICIENT = 0.002;
     static _DEPTH = 10;
 
-//ارخميدس
+    //ارخميدس
     static CalculateArchimedesForce(objectVolume) {
         const archimedesForceMagnitude = this._DENSITY_OF_LIQUID * this._GRAVITY_ACCELERATION * objectVolume;
         const archimedesForce = new Vector(0, archimedesForceMagnitude, 0);
         return archimedesForce;
     }
-//الثقل
+    //الثقل
     static CalculateWeightForce(mass) {
         const weightForce = this._GRAVITY_ACCELERATION * mass;
         const weightVector = new Vector(0, weightForce, 0);
         return weightVector;
     }
 
-//دفع المحرك
+    //دفع المحرك
     static CalculateEngineForce(power, fanRPM) {
         const forceZ = power * fanRPM;
         const engineForce = new Vector(0, 0, forceZ);
         return engineForce;
     }
 
-//قولى المقاومة
+    //قولى المقاومة
     static CalculateResistanceForce(area, velocity) {
         const frictionCoefficient = this._FRICTION_COEFFICIENT;
         const density = this._DENSITY_OF_LIQUID;
@@ -41,7 +41,7 @@ class Physic {
         return new Vector(resistanceX, resistanceY, resistanceZ);
     }
 
-// القصور الذاتي للاسطوانة
+    // القصور الذاتي للاسطوانة
     static CalculateMomentOfInertiaOfCylinder(mass, radius, length) {
         const I_longitudinal = 0.5 * mass * radius ** 2;
         const I_transverse = 0.25 * mass * radius ** 2 + (1 / 12) * mass * length ** 2;
@@ -53,13 +53,13 @@ class Physic {
         ];
     }
 
-//مساحة السطح الجانبي للاسطونة
+    //مساحة السطح الجانبي للاسطونة
     static CalculateCylinderArea(radius, length) {
-        const area = 2 * Math.PI * radius * length ;
+        const area = 2 * Math.PI * radius * length;
         return area;
     }
 
-//حجم الاستطوانة
+    //حجم الاستطوانة
     static CalculateCylinderVolume(radius, length) {
         const volume = Math.PI * radius ** 2 * length;
         return volume;
@@ -81,7 +81,7 @@ class Physic {
 
         return resistanceForce.Rotation_Y(angle);
     }
-    
+
     //عامودي حول X
     static CalculateResistanceForceOnVerticalPlanes(forceY, forceZ, angle) {
         const angleRadians = angle * (Math.PI / 180);
@@ -112,13 +112,13 @@ class Physic {
 
     //تيارات بحرية
     static CalculateStrengthOfOceanCurrents(area, velocity) {
-        
+
         const frictionCoefficient = this._FRICTION_COEFFICIENT;
         const density = this._DENSITY_OF_LIQUID;
         const velocityMagnitude = velocity.getLength();
 
         const resistanceX = frictionCoefficient * density * area * velocityMagnitude * velocity.x;
-       
+
         return new Vector(resistanceX, 0, 0);
     }
 
