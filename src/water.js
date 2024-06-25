@@ -1,15 +1,14 @@
-import { BoxGeometry, Color, DoubleSide, Mesh, PlaneGeometry, RepeatWrapping, ShaderMaterial, TextureLoader, UniformsUtils, Vector2, Vector3 } from "three";
+import { BoxGeometry, Color, DoubleSide, Mesh, PlaneGeometry, RepeatWrapping, ShaderMaterial, TextureLoader, UniformsUtils, Vector2, Vector3 } from "three"
 import { Water } from 'three/examples/jsm/objects/Water'
-import * as THREE from 'three';
 
 const UnderwaterShader = {
     uniforms: {
         'time': { value: 1.0 },
-        'resolution': { value: new THREE.Vector2() },
-        'cameraPos': { value: new THREE.Vector3() },
-        'sunColor': { value: new THREE.Color(0xffffff) },
-        'waterColor': { value: new THREE.Color(0x001E0F) },
-        'sunDirection': { value: new THREE.Vector3(0.70707, 0.70707, 0) },
+        'resolution': { value: new Vector2() },
+        'cameraPos': { value: new Vector3() },
+        'sunColor': { value: new Color(0xffffff) },
+        'waterColor': { value: new Color(0x001E0F) },
+        'sunDirection': { value: new Vector3() },
     },
     vertexShader: `
         varying vec3 vWorldPosition;
@@ -38,8 +37,8 @@ const UnderwaterShader = {
     `,
 };
 export class AppWater extends Water {
-    static SPATIAL_SIZE = 100000;
-    static waterGeometry = new PlaneGeometry(AppWater.SPATIAL_SIZE, AppWater.SPATIAL_SIZE);
+    static SPATIAL_SIZE = 100000
+    static waterGeometry = new PlaneGeometry(AppWater.SPATIAL_SIZE, AppWater.SPATIAL_SIZE)
 
     constructor(fogEnabled) {
         super(
@@ -48,7 +47,7 @@ export class AppWater extends Water {
                 textureWidth: 512,
                 textureHeight: 512,
                 waterNormals: new TextureLoader().load('../textures/waternormals.jpg', function (texture) {
-                    texture.wrapS = texture.wrapT = RepeatWrapping;
+                    texture.wrapS = texture.wrapT = RepeatWrapping
                 }),
                 sunDirection: new Vector3(),
                 sunColor: 0xFFFFFF,
@@ -57,8 +56,8 @@ export class AppWater extends Water {
                 side: DoubleSide,
                 fog: fogEnabled
             }
-        );
-        this.rotation.x = -Math.PI / 2;
+        )
+        this.rotation.x = -Math.PI / 2
         // Custom underwater shader
         const underwaterMaterial = new ShaderMaterial({
             uniforms: UniformsUtils.clone(UnderwaterShader.uniforms),
@@ -66,36 +65,31 @@ export class AppWater extends Water {
             fragmentShader: UnderwaterShader.fragmentShader,
             transparent: true,
             side: DoubleSide
-        });
-        const underWaterGeometry = new BoxGeometry(AppWater.SPATIAL_SIZE, 100, AppWater.SPATIAL_SIZE)
-        const underwaterMesh = new Mesh(underWaterGeometry, underwaterMaterial);
-        this.underwaterMaterial = underwaterMaterial
-        this.add(underwaterMesh);
+        })
+
     }
-
     showGui(gui) {
-        const waterUniforms = this.material.uniforms;
-        const waterFolder = gui.addFolder('Water');
-        waterFolder.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale');
-        waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
-        waterFolder.open();
+        const waterUniforms = this.material.uniforms
+        const waterFolder = gui.addFolder('Water')
+        waterFolder.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale')
+        waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size')
+        waterFolder.open()
 
-        // const underWaterFolder = gui.addFolder('Underwater');
-        // const underWaterMaterial = this.children[0].material;
-        // underWaterFolder.addColor(underWaterMaterial.uniforms.waterColor.value, 'value').name('Color');
-        // // underWaterFolder.add(underWaterMaterial.uniforms.sunColor.value, 'value').name('Sun Color');
-        // underWaterFolder.open();
+        // const underWaterFolder = gui.addFolder('Underwater')
+        // const underWaterMaterial = this.children[0].material
+        // underWaterFolder.addColor(underWaterMaterial.uniforms.waterColor.value, 'value').name('Color')
+        // // underWaterFolder.add(underWaterMaterial.uniforms.sunColor.value, 'value').name('Sun Color')
+        // underWaterFolder.open()
     }
     setupCamera(camera) {
         this.camera = camera
     }
-    animate(time) {
-        this.material.uniforms.time.value = time;
-        if (this.camera) {
-            this.underwaterMaterial.uniforms.cameraPos.value.copy(this.camera.position);
-        }
-        this.underwaterMaterial.uniforms.time.value = time
-
+    animate() {
+        this.material.uniforms['time'].value += 1.0 / 60.0
+        // if (this.camera) {
+        //     this.underwaterMaterial.uniforms.cameraPos.value.copy(this.camera.position)
+        // }
+        // this.underwaterMaterial.uniforms.time.value += 1.0 / 60.0
     }
 }
 

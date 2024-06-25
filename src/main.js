@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { Submarine } from './submarine'
 import { Particles } from './particles'
@@ -8,6 +8,7 @@ import { SubmarineCamera } from './cameras/submarine_camera'
 import { AppSky } from './sky'
 import { AppSun } from './sun'
 import { AppWater } from './water'
+import { AmbientLight, DirectionalLight, Scene, WebGLRenderer } from 'three'
 
 
 class SubmarineSimulationApp {
@@ -20,9 +21,9 @@ class SubmarineSimulationApp {
     }
     setupRenderer() {
         const canvas = document.querySelector('#c') // جيب القماشة يلي رح نرندر عليها من ملف ال اتش تي م ل
-        const renderer = new THREE.WebGLRenderer({ antialias: true, canvas })
+        const renderer = new WebGLRenderer({ antialias: true, canvas })
         renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMapping = ACESFilmicToneMapping
         renderer.toneMappingExposure = 0.5
         this.renderer = renderer
     }
@@ -37,13 +38,13 @@ class SubmarineSimulationApp {
         this.cameras.push(mainCamera)
     }
     setupLights() {
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.5); // Soft white light
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        const ambientLight = new AmbientLight(0x404040, 0.5); // Soft white light
+        const directionalLight = new DirectionalLight(0xffffff, 1.0);
         directionalLight.position.set(1, 1, 1).normalize();
         this.lights = [ambientLight, directionalLight]
     }
     setupScene() {
-        const scene = new THREE.Scene()
+        const scene = new Scene()
         this.scene = scene
         this.lights.forEach(light => scene.add(light))
         let animatableComponents = []
@@ -53,11 +54,13 @@ class SubmarineSimulationApp {
         const water = new AppWater(fogEnabled)
         scene.add(water)
         animatableComponents.push(water)
+        const underWater = water.getUnderWaterMesh()
+        underWater.position.set(0, -50, 0)
+        scene.add(underWater)
         //particles
         const particles = new Particles()
         scene.add(particles)
         animatableComponents.push(particles)
-
 
         const underWaterParticles = new Particles(true)
         scene.add(underWaterParticles)
@@ -65,14 +68,9 @@ class SubmarineSimulationApp {
         // Skybox
         const sky = new AppSky()
         scene.add(sky)
-        // const ocean = new Ocean()
-        // ocean.load().then((oceanObject) => {
-        //     animatableComponents.push(ocean)
-        //     scene.add(oceanObject)
-        // })
+
         const sun = new AppSun(scene, this.renderer, sky, water)
         sun.update()
-
         // Submarine
         let submarine = new Submarine()
         submarine.load().then(submarineMesh => {
@@ -145,20 +143,20 @@ main()
 
 //under water
 // Create the underwater geometry and material
-// const underWaterGeometry = new THREE.BoxGeometry(AppWater.SPATIAL_SIZE, 100, AppWater.SPATIAL_SIZE);
-// const underWaterMaterial = new THREE.MeshPhysicalMaterial({
-//     color: new THREE.Color(0x001E0F),
+// const underWaterGeometry = new BoxGeometry(AppWater.SPATIAL_SIZE, 100, AppWater.SPATIAL_SIZE);
+// const underWaterMaterial = new MeshPhysicalMaterial({
+//     color: new Color(0x001E0F),
 //     opacity: 0.8,
 //     transparent: true,
 //     depthWrite: true,
 
-//     side: THREE.DoubleSide,
+//     side: DoubleSide,
 //     roughness: 1,
 //     metalness: 0,
 //     clearcoat: 1,
 //     clearcoatRoughness: 0.1
 // });
 
-// const underWaterMesh = new THREE.Mesh(underWaterGeometry, underWaterMaterial);
+// const underWaterMesh = new Mesh(underWaterGeometry, underWaterMaterial);
 // underWaterMesh.position.y = -1; // Adjust based on how deep you want the underwater effect to be
 // scene.add(underWaterMesh);
