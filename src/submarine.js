@@ -35,7 +35,7 @@ export class Submarine {
         return new Promise((resolve, reject) => {
             loader.load(this.modelPath, (gltf) => {
                 const submarineMesh = gltf.scene
-                submarineMesh.position.set(0, 0, 0)
+                submarineMesh.position.set(0, -10, 0)
                 // submarineMesh.castShadow = true
                 submarineMesh.scale.setScalar(10)
                 this.submarineMesh = submarineMesh
@@ -73,7 +73,7 @@ export class Submarine {
             const goingForward = holdTime > 0
             const goingBackward = holdTime < 0
             if (goingForward) {
-                velocity =_forwardVelocity()
+                velocity = _forwardVelocity()
             }
             else if (goingBackward) {
                 velocity = _reverseVelocity()
@@ -95,7 +95,7 @@ export class Submarine {
                     break
             }
         })
-        window.addEventListener('keyup', (event) =>{
+        window.addEventListener('keyup', (event) => {
             const key = event.key
             switch (key) {
                 case 'w':

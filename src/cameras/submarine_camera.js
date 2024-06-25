@@ -6,7 +6,7 @@ export class SubmarineCamera extends AppCamera {
     setupControls(renderer) {
         const controls = new OrbitControls(this, renderer.domElement)
         controls.maxPolarAngle = Math.PI * 0.495
-        controls.target.set(0, 4, -4)
+        controls.target.set(0, 0, 0)
         controls.minDistance = 15.0
         controls.maxDistance = 25.0
         controls.update()
