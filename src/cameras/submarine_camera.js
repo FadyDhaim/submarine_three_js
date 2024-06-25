@@ -8,7 +8,7 @@ export class SubmarineCamera extends AppCamera {
         controls.maxPolarAngle = Math.PI * 0.495
         controls.target.set(0, 0, 0)
         controls.minDistance = 15.0
-        controls.maxDistance = 25.0
+        controls.maxDistance = 100
         controls.update()
     }
     animate() {

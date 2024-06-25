@@ -1,41 +1,5 @@
-import { BoxGeometry, Color, DoubleSide, Mesh, PlaneGeometry, RepeatWrapping, ShaderMaterial, TextureLoader, UniformsUtils, Vector2, Vector3 } from "three"
+import { DoubleSide, Mesh, PlaneGeometry, RepeatWrapping, ShaderMaterial, TextureLoader, UniformsUtils, Vector2, Vector3 } from "three"
 import { Water } from 'three/examples/jsm/objects/Water'
-
-const UnderwaterShader = {
-    uniforms: {
-        'time': { value: 1.0 },
-        'resolution': { value: new Vector2() },
-        'cameraPos': { value: new Vector3() },
-        'sunColor': { value: new Color(0xffffff) },
-        'waterColor': { value: new Color(0x001E0F) },
-        'sunDirection': { value: new Vector3() },
-    },
-    vertexShader: `
-        varying vec3 vWorldPosition;
-        void main() {
-            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-            vWorldPosition = worldPosition.xyz;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-    `,
-    fragmentShader: `
-        uniform float time;
-        uniform vec2 resolution;
-        uniform vec3 cameraPos;
-        uniform vec3 sunColor;
-        uniform vec3 waterColor;
-        uniform vec3 sunDirection;
-        varying vec3 vWorldPosition;
-
-        void main() {
-            float distance = length(vWorldPosition - cameraPos);
-            float attenuation = exp(-distance * 0.02);
-            vec3 color = mix(waterColor, sunColor, dot(normalize(vWorldPosition - cameraPos), sunDirection));
-            color *= attenuation;
-            gl_FragColor = vec4(color, 1.0);
-        }
-    `,
-};
 export class AppWater extends Water {
     static SPATIAL_SIZE = 100000
     static waterGeometry = new PlaneGeometry(AppWater.SPATIAL_SIZE, AppWater.SPATIAL_SIZE)
@@ -58,14 +22,6 @@ export class AppWater extends Water {
             }
         )
         this.rotation.x = -Math.PI / 2
-        // Custom underwater shader
-        const underwaterMaterial = new ShaderMaterial({
-            uniforms: UniformsUtils.clone(UnderwaterShader.uniforms),
-            vertexShader: UnderwaterShader.vertexShader,
-            fragmentShader: UnderwaterShader.fragmentShader,
-            transparent: true,
-            side: DoubleSide
-        })
 
     }
     showGui(gui) {
@@ -74,22 +30,13 @@ export class AppWater extends Water {
         waterFolder.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale')
         waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size')
         waterFolder.open()
-
-        // const underWaterFolder = gui.addFolder('Underwater')
-        // const underWaterMaterial = this.children[0].material
-        // underWaterFolder.addColor(underWaterMaterial.uniforms.waterColor.value, 'value').name('Color')
-        // // underWaterFolder.add(underWaterMaterial.uniforms.sunColor.value, 'value').name('Sun Color')
-        // underWaterFolder.open()
     }
     setupCamera(camera) {
         this.camera = camera
     }
     animate() {
         this.material.uniforms['time'].value += 1.0 / 60.0
-        // if (this.camera) {
-        //     this.underwaterMaterial.uniforms.cameraPos.value.copy(this.camera.position)
-        // }
-        // this.underwaterMaterial.uniforms.time.value += 1.0 / 60.0
+
     }
 }
 

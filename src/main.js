@@ -8,7 +8,8 @@ import { SubmarineCamera } from './cameras/submarine_camera'
 import { AppSky } from './sky'
 import { AppSun } from './sun'
 import { AppWater } from './water'
-import { AmbientLight, DirectionalLight, Scene, WebGLRenderer } from 'three'
+import { ACESFilmicToneMapping, AmbientLight, DirectionalLight, Scene, WebGLRenderer } from 'three'
+import { Underwater } from './underwater'
 
 
 class SubmarineSimulationApp {
@@ -38,15 +39,15 @@ class SubmarineSimulationApp {
         this.cameras.push(mainCamera)
     }
     setupLights() {
-        const ambientLight = new AmbientLight(0x404040, 0.5); // Soft white light
-        const directionalLight = new DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(1, 1, 1).normalize();
-        this.lights = [ambientLight, directionalLight]
+        // const ambientLight = new AmbientLight(0x404040, 0.5); // Soft white light
+        // const directionalLight = new DirectionalLight(0xffffff, 1.0);
+        // directionalLight.position.set(1, 1, 1).normalize();
+        // this.lights = [ambientLight, directionalLight]
     }
     setupScene() {
         const scene = new Scene()
         this.scene = scene
-        this.lights.forEach(light => scene.add(light))
+        // this.lights.forEach(light => scene.add(light))
         let animatableComponents = []
         this.animatableComponents = animatableComponents
         // Water
@@ -54,17 +55,17 @@ class SubmarineSimulationApp {
         const water = new AppWater(fogEnabled)
         scene.add(water)
         animatableComponents.push(water)
-        const underWater = water.getUnderWaterMesh()
-        underWater.position.set(0, -50, 0)
+
+        const underWater = new Underwater()
         scene.add(underWater)
         //particles
-        const particles = new Particles()
-        scene.add(particles)
-        animatableComponents.push(particles)
+        // const particles = new Particles()
+        // scene.add(particles)
+        // animatableComponents.push(particles)
 
-        const underWaterParticles = new Particles(true)
-        scene.add(underWaterParticles)
-        animatableComponents.push(underWaterParticles)
+        // const underWaterParticles = new Particles(true)
+        // scene.add(underWaterParticles)
+        // animatableComponents.push(underWaterParticles)
         // Skybox
         const sky = new AppSky()
         scene.add(sky)

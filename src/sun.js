@@ -22,7 +22,7 @@ export class AppSun extends Vector3 {
         this.setFromSphericalCoords(1, phi, theta)
         this.sky.material.uniforms['sunPosition'].value.copy(this)
         this.water.material.uniforms['sunDirection'].value.copy(this).normalize()
-        this.water.underwaterMaterial.uniforms['sunDirection'].value.copy(this).normalize()
+        // this.water.underwaterMaterial.uniforms['sunDirection'].value.copy(this).normalize()
         if (this.renderTarget !== undefined) this.renderTarget.dispose()
         this.sceneEnv.add(this.sky)
         this.renderTarget = this.pmremGenerator.fromScene(this.sceneEnv)

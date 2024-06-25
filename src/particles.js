@@ -7,7 +7,7 @@ export class Particles extends Points{
         //الهندسية يلي بتسمحلنا نتحكم بال vertices
         const particlesGeometry = new BufferGeometry();
         const particlesPositions = [];
-
+        
         for (let i = 0; i < particleCount; i++) {
             particlesPositions.push((Math.random() * 2 - 1) * 5000);
             if (underWaterOnly) {
