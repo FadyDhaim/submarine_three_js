@@ -1,7 +1,7 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 export class Underwater{
     constructor() {
-        this.modelPath = '../../models/output.glb'
+        this.modelPath = '../../models/underwater.glb'
     }
     async load() {
         return new Promise((resolve, reject) => {
