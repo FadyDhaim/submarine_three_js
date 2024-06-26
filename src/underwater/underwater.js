@@ -1,0 +1,19 @@
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+export class Underwater{
+    constructor() {
+        this.modelPath = '../../models/output.glb'
+    }
+    async load() {
+        return new Promise((resolve, reject) => {
+            const loader = new GLTFLoader()
+            loader.load(this.modelPath, (model) => {
+                const object = model.scene
+                // object.scale.setScalar(200)
+                object.scale.set(200, 100, 200)
+                object.position.y = -27.5
+                // object.position.y = -55
+                resolve(object)
+            })
+        })
+    }
+}

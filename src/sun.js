@@ -1,7 +1,7 @@
 import { MathUtils, PMREMGenerator, Scene, Vector3 } from "three"
 
 export class AppSun extends Vector3 {
-    constructor(mainScene, renderer, sky, water) {
+    constructor(mainScene, renderer, sky, water, underwater) {
         super()
         this.parameters = {
             elevation: 2,
@@ -13,6 +13,7 @@ export class AppSun extends Vector3 {
         this.scene = mainScene
         this.sky = sky
         this.water = water
+        this.underwater = underwater
         this.update = this.update.bind(this)
     }
     update() {
@@ -22,7 +23,7 @@ export class AppSun extends Vector3 {
         this.setFromSphericalCoords(1, phi, theta)
         this.sky.material.uniforms['sunPosition'].value.copy(this)
         this.water.material.uniforms['sunDirection'].value.copy(this).normalize()
-        // this.water.underwaterMaterial.uniforms['sunDirection'].value.copy(this).normalize()
+        // this.underwater.material.uniforms.lightDirection.value.copy(this)
         if (this.renderTarget !== undefined) this.renderTarget.dispose()
         this.sceneEnv.add(this.sky)
         this.renderTarget = this.pmremGenerator.fromScene(this.sceneEnv)

@@ -1,15 +1,13 @@
-
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { Submarine } from './submarine'
-import { Particles } from './particles'
 import { AppCamera } from './cameras/app_camera'
 import { MainCamera } from './cameras/main_camera'
 import { SubmarineCamera } from './cameras/submarine_camera'
 import { AppSky } from './sky'
 import { AppSun } from './sun'
 import { AppWater } from './water'
-import { ACESFilmicToneMapping, AmbientLight, DirectionalLight, Scene, WebGLRenderer } from 'three'
-import { Underwater } from './underwater'
+import { ACESFilmicToneMapping, AmbientLight, DirectionalLight, FogExp2, Scene, WebGLRenderer } from 'three'
+import { Underwater } from './underwater/underwater'
 
 
 class SubmarineSimulationApp {
@@ -39,15 +37,17 @@ class SubmarineSimulationApp {
         this.cameras.push(mainCamera)
     }
     setupLights() {
-        // const ambientLight = new AmbientLight(0x404040, 0.5); // Soft white light
-        // const directionalLight = new DirectionalLight(0xffffff, 1.0);
-        // directionalLight.position.set(1, 1, 1).normalize();
-        // this.lights = [ambientLight, directionalLight]
+        const ambientLight = new AmbientLight(0x404040, 0.5); // Soft white light
+        const directionalLight = new DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(1, 1, 1).normalize();
+        this.lights = [ambientLight, directionalLight]
     }
     setupScene() {
         const scene = new Scene()
         this.scene = scene
-        // this.lights.forEach(light => scene.add(light))
+        const underwaterFog = new FogExp2(0x001e0f, 0.0002); // Adjust density as needed
+        scene.fog = underwaterFog;
+        this.lights.forEach(light => scene.add(light))
         let animatableComponents = []
         this.animatableComponents = animatableComponents
         // Water
@@ -56,21 +56,15 @@ class SubmarineSimulationApp {
         scene.add(water)
         animatableComponents.push(water)
 
-        const underWater = new Underwater()
-        scene.add(underWater)
-        //particles
-        // const particles = new Particles()
-        // scene.add(particles)
-        // animatableComponents.push(particles)
-
-        // const underWaterParticles = new Particles(true)
-        // scene.add(underWaterParticles)
-        // animatableComponents.push(underWaterParticles)
+        const underwater = new Underwater()
+        underwater.load().then((underwater) => {
+            scene.add(underwater)
+        })
         // Skybox
         const sky = new AppSky()
         scene.add(sky)
 
-        const sun = new AppSun(scene, this.renderer, sky, water)
+        const sun = new AppSun(scene, this.renderer, sky, water, underwater)
         sun.update()
         // Submarine
         let submarine = new Submarine()
@@ -82,8 +76,11 @@ class SubmarineSimulationApp {
             submarineMesh.add(submarineCamera)
             this.cameras.push(submarineCamera)
             this.animatableComponents.push(submarineCamera)
-            water.setupCamera(submarineCamera)
+            // underwater.updateCameraPosition(submarineCamera)
+            // scene.add(underwater)
+            // this.underwater = underwater
         })
+        
         // GUI        
         const gui = new GUI()
         water.showGui(gui)
@@ -97,12 +94,16 @@ class SubmarineSimulationApp {
     animate(time) {
         time *= 0.001  // حول الوقت من ميلي ثانية ل ثانية
         this.ensureResponsiveDisplay() //مشان وقت نبعبص بالنافذة... عادي ما تقربي عليه
-        // console.log(this.animatableComponents.length)
+        
         for (let animtableComponent of this.animatableComponents) {
             animtableComponent.animate(time)
         }
+        // if (this.underwater) {
+        //     this.underwater.updateCameraPosition(this.cameras[1].position)
+        // }
         this.render()
     }
+    
     render() {
         this.renderer.render(this.scene, this.cameras[1] ? this.cameras[1] : this.mainCamera) //كاميرا الغواصة
     }
@@ -141,23 +142,3 @@ function main() {
     app.start()
 }
 main()
-
-//under water
-// Create the underwater geometry and material
-// const underWaterGeometry = new BoxGeometry(AppWater.SPATIAL_SIZE, 100, AppWater.SPATIAL_SIZE);
-// const underWaterMaterial = new MeshPhysicalMaterial({
-//     color: new Color(0x001E0F),
-//     opacity: 0.8,
-//     transparent: true,
-//     depthWrite: true,
-
-//     side: DoubleSide,
-//     roughness: 1,
-//     metalness: 0,
-//     clearcoat: 1,
-//     clearcoatRoughness: 0.1
-// });
-
-// const underWaterMesh = new Mesh(underWaterGeometry, underWaterMaterial);
-// underWaterMesh.position.y = -1; // Adjust based on how deep you want the underwater effect to be
-// scene.add(underWaterMesh);

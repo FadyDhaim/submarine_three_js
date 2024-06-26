@@ -1,4 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { clamp } from 'three/src/math/MathUtils'
 // const motionDirections = Object.freeze(
 //     {
 //         reverse: Symbol('reverse'),
@@ -25,9 +26,14 @@ export class Submarine {
         this.accelerationState = null
         this.maximumForwardSpeed = 6.0
         this.maximumReverseSpeed = -4.0
+        this.maximumSubmersionSpeed = -2.0
+        this.initialDepth = -10.0
+        this.maximumDepth = -50.0
         this.holdTime = 0 //in frames
-        this.maximumForwardHoldTime = 360  //4 seconds worth of frames @60 FPS
+        this.submersionHoldTime = 0
+        this.maximumForwardHoldTime = 360  //6 seconds worth of frames @60 FPS
         this.maximumReverseHoldTime = -360
+        this.maximumSubmersionHoldTime = -180 //3s
         this.didDampenLastFrame = false
     }
     async load() {
@@ -35,7 +41,7 @@ export class Submarine {
         return new Promise((resolve, reject) => {
             loader.load(this.modelPath, (gltf) => {
                 const submarineMesh = gltf.scene
-                submarineMesh.position.set(0, -10, 0)
+                submarineMesh.position.set(0, this.initialDepth, 0)
                 // submarineMesh.castShadow = true
                 submarineMesh.scale.setScalar(10)
                 this.submarineMesh = submarineMesh
@@ -54,6 +60,13 @@ export class Submarine {
         }
         const velocity = this._holdTimeToLinearVelocity()
         this.submarineMesh.position.z -= velocity
+        const currentDepth = this.submarineMesh.position.y
+        if (currentDepth >= this.maximumDepth && currentDepth <= this.initialDepth) {
+            const submersionVelocity = this._holdTimeToLinearSubmersionVelocity()
+            let nextDepth = currentDepth + submersionVelocity
+            nextDepth = clamp(nextDepth, this.maximumDepth, this.initialDepth)
+            this.submarineMesh.position.y = nextDepth
+        }
         // console.log(velocity)
     }
     _holdTimeToLinearVelocity() {
@@ -81,6 +94,18 @@ export class Submarine {
         }
         return velocity
     }
+    _holdTimeToLinearSubmersionVelocity() {
+        let velocity
+        const holdTime = this.submersionHoldTime
+        const idleOrNeutral = holdTime == 0
+        if (idleOrNeutral) {
+            velocity = 0
+        }
+        else {
+            velocity =  holdTime * (this.maximumSubmersionSpeed / this.maximumSubmersionHoldTime)
+        }
+        return velocity
+    }
     _setupInteractivity() {
         window.addEventListener('keydown', (event) => {
             const key = event.key
@@ -92,6 +117,12 @@ export class Submarine {
                 case 's':
                     this.accelerateBackward()
                     console.log('S')
+                    break
+                case 'e':
+                    this.accelerateUpward()
+                    break
+                case 'q':
+                    this.accelerateDownward()
                     break
             }
         })
@@ -105,6 +136,12 @@ export class Submarine {
                     break
             }
         })
+    }
+    accelerateUpward() {
+        this.pushSubmersionHoldTimeBackward()
+    }
+    accelerateDownward() {
+        this.pushSubmersionHoldTimeAhead()
     }
     accelerateForward() {
         this.updateAccelerationState(accelerationStates.accelerating)
@@ -122,6 +159,16 @@ export class Submarine {
     pushHoldTimeBackward() {
         if (this.holdTime > this.maximumReverseHoldTime) {
             this.holdTime--
+        }
+    }
+    pushSubmersionHoldTimeAhead() {
+        if (this.submersionHoldTime > this.maximumSubmersionHoldTime) {
+            this.submersionHoldTime--
+        }
+    }
+    pushSubmersionHoldTimeBackward() {
+        if (this.submersionHoldTime < Math.abs(this.maximumSubmersionHoldTime)) {
+            this.submersionHoldTime++
         }
     }
     dampenHoldTime() {

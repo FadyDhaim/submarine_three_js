@@ -17,7 +17,7 @@ export class AppWater extends Water {
                 sunColor: 0xFFFFFF,
                 waterColor: 0x001E0F,
                 distortionScale: 3.7,
-                side: DoubleSide,
+                side: DoubleSide, 
                 fog: fogEnabled
             }
         )
@@ -31,12 +31,8 @@ export class AppWater extends Water {
         waterFolder.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size')
         waterFolder.open()
     }
-    setupCamera(camera) {
-        this.camera = camera
-    }
     animate() {
         this.material.uniforms['time'].value += 1.0 / 60.0
-
     }
 }
 
